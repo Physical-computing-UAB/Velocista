@@ -1,27 +1,30 @@
 #include <QTRSensors.h>
 
-#define Kp 0.1 // experiment to determine this, start by something small that just makes your bot follow the line at a slow speed
-#define Kd 4// experiment to determine this, slowly increase the speeds and adjust this value. ( Note: Kp < Kd) 
-#define MaxSpeed 255// max speed of the robot
-#define BaseSpeed 255 // this is the speed at which the motors should spin when the robot is perfectly on the line
-#define NUM_SENSORS  8     // number of sensors used
+#define Kp 0.1          // experiment to determine this, start by something small that just makes your bot follow the line at a slow speed
+#define Kd 4            // experiment to determine this, slowly increase the speeds and adjust this value. ( Note: Kp < Kd) 
+#define MaxSpeed 255    // max speed of the robot
+#define BaseSpeed 255   // this is the speed at which the motors should spin when the robot is perfectly on the line
+#define NUM_SENSORS  8  // number of sensors used
 
 #define speedturn 180
 
-#define rightMotor1 A2
-#define rightMotor2 A1
+#define rightMotor1   A2
+#define rightMotor2   A1
 #define rightMotorPWM 11
-#define leftMotor1 A4
-#define leftMotor2 A5
-#define leftMotorPWM 10
-#define motorPower A3
+#define leftMotor1    A4
+#define leftMotor2    A5
+#define leftMotorPWM  10
+#define motorPower    A3
 
 QTRSensorsRC qtrrc((unsigned char[]) {2,3,4,5,6,7,8,9} ,NUM_SENSORS, 2500, QTR_NO_EMITTER_PIN);
 
 unsigned int sensorValues[NUM_SENSORS];
+int incomingByte = 0; 
 
 void setup()
 {
+  Serial.begin(9600); // opens serial port, sets data rate to 9600 bps 
+  
   pinMode(rightMotor1, OUTPUT);
   pinMode(rightMotor2, OUTPUT);
   pinMode(rightMotorPWM, OUTPUT);
@@ -60,7 +63,11 @@ int position = qtrrc.readLine(sensors);
 void loop()
 {  
   position = qtrrc.readLine(sensors); // get calibrated readings along with the line position, refer to the QTR Sensors Arduino Library for more details on line position.
-  
+   if (Serial.available() > 0) {
+    incomingByte = Serial.read(); // read the incoming byte
+    Serial.print(" I received:");
+    Serial.println(incomingByte); 
+   }
   if(position>6700){
     move(1, speedturn, 1);//motor derecho hacia adelante
     move(0, speedturn, 0);//motor izquierdo hacia adelante
